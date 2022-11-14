@@ -14,13 +14,13 @@ class W2Homework {
         }
         var a = 0L
         var b = 1L
-        var c = 1L
-        (1..n-2).forEach { i ->
-            c = a + b
+        var sum = 0L
+        (2 ..  n).forEach { _ ->
+            sum = a + b
             a = b
-            b = c
+            b = sum
         }
-        return c
+        return sum
     }
 
     /**
@@ -28,6 +28,18 @@ class W2Homework {
      * e.g. "(a * b))" should return false
      */
     fun checkBraces(string: String): Boolean {
-        return string.count { it == '(' } == string.count { it == ')' }
+        //Just check round brackets
+        var stack = 0
+        string.forEach {
+            when(it){
+                '(' -> stack++
+                ')' -> {
+                    if (stack < 1) return false
+                    stack--
+                }
+            }
+        }
+        if (stack != 0) return false
+        return true
     }
 }
