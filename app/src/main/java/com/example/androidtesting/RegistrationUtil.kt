@@ -12,6 +12,9 @@ object RegistrationUtil {
         password: String,
         confirmedPassword: String
     ): Boolean {
+        if (username.isBlank()) return false
+        if (password.length < 2) return false
+        if (password != confirmedPassword) return false
         return true
     }
 }

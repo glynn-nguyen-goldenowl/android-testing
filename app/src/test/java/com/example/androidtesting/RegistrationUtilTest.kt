@@ -16,7 +16,33 @@ class RegistrationUtilTest{
         assertThat(result).isFalse()
     }
 
-    // password less than two digits
-    // confirmed password not the same as password.
-    // valid user input
+    @Test
+    fun `password less than two digits`(){
+        val result = RegistrationUtil.validateRegistrationUserInput(
+            username = "abcd",
+            password = "1",
+            confirmedPassword = "1"
+        )
+        assertThat(result).isFalse()
+    }
+
+    @Test
+    fun `confirmed password not the same as password`(){
+        val result = RegistrationUtil.validateRegistrationUserInput(
+            username = "abcd",
+            password = "12",
+            confirmedPassword = "123"
+        )
+        assertThat(result).isFalse()
+    }
+
+    @Test
+    fun `valid user input`(){
+        val result = RegistrationUtil.validateRegistrationUserInput(
+            username = "abcd",
+            password = "123",
+            confirmedPassword = "123"
+        )
+        assertThat(result).isTrue()
+    }
 }
