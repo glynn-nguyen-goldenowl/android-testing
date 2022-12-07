@@ -17,7 +17,9 @@ android {
         versionName "1.0"
         buildConfigField("String", "API_KEY",  '"31413821-0cb66d81e5604c7e40595c4ad"')
         buildConfigField("String", "BASE_URL",  '"https://pixabay.com"')
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+       // testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "com.example.androidtesting.HiltTestRunner"
+
     }
 
     buildTypes {
