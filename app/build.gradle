@@ -47,18 +47,23 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.5.1'
     implementation 'com.google.android.material:material:1.7.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.fragment:fragment-ktx:1.5.5'
 
     implementation "androidx.annotation:annotation:$androidXAnnotations"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion"
     implementation "androidx.test.espresso:espresso-idling-resource:$espressoVersion"
     implementation "androidx.room:room-runtime:$roomVersion"
-    implementation 'com.google.ar:core:1.30.0'
+    implementation 'androidx.navigation:navigation-fragment:2.5.3'
     kapt "androidx.room:room-compiler:$roomVersion"
 
     // Hilt
     implementation "com.google.dagger:hilt-android:$hiltVersion"
     implementation "androidx.hilt:hilt-navigation-compose:$hiltAndroidXVersion"
     kapt "com.google.dagger:hilt-compiler:$hiltVersion"
+    //implementation "androidx.hilt:hilt-lifecycle-viewmodel:1.0.0-alpha03"
+
+
+
 
     // Retrofit
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
