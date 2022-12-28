@@ -69,24 +69,10 @@ object AppModule {
     ): ShoppingRepository = DefaultShoppingRepository(localDataSource, remoteDataSource)
 
 
-    @Singleton
-    @Provides
-    fun provideRequestManager(
-        @ApplicationContext context: Context
-    ): RequestManager{
-        return Glide.with(context).setDefaultRequestOptions(
-            RequestOptions()
-                .placeholder(R.drawable.ic_image)
-                .error(R.drawable.ic_image))
-    }
 
 
-    @Provides
-    fun provideImageListAdapter(
-        requestManager: RequestManager
-    ): ImageListAdapter{
-        return ImageListAdapter(requestManager)
-    }
+
+
 
 
 }
