@@ -1,13 +1,11 @@
 package com.example.androidtesting.ui.shopping
 
-import android.util.Log
-import androidx.lifecycle.SavedStateHandle
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.androidtesting.data.DataResult
 import com.example.androidtesting.data.source.ShoppingRepository
 import com.example.androidtesting.data.source.local.ShoppingItem
-import com.example.androidtesting.ui.add.AddShoppingItemUiState
 import com.example.androidtesting.util.Async
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -32,38 +30,38 @@ class ShoppingViewModel @Inject constructor(
             }
         }
 
-    val uiState: StateFlow<ShoppingUiState> = combine(
-        _shoppingItemListAsync, shoppingRepository.observeTotalPrice(), _errorMessage
-    ){ itemList, totalPrice, errorMessage ->
-        when(itemList){
-            Async.Loading ->{
-                ShoppingUiState(listOf(), 0, loading = true, errorMessage = errorMessage)
-            }
-            is Async.Success -> {
-                if (itemList.data is DataResult.Success) {
-                    ShoppingUiState(
-                        itemList.data.data,
-                        (totalPrice as DataResult.Success).data,
-                        loading = false,
-                        errorMessage = errorMessage
-                    )
-                } else {
-                    ShoppingUiState(
-                        listOf(),
-                        (totalPrice as DataResult.Success).data,
-                        loading = false,
-                        errorMessage = errorMessage
-                    )
-                }
-
+    private val _totalPriceAsync = shoppingRepository.observeTotalPrice()
+        .map {
+            Async.Success(it)
+        }
+        .onStart<Async<DataResult<Int>>> { emit(Async.Loading) }
+        .onEach {
+            if(it is Async.Success && it.data is DataResult.Error){
+                _errorMessage.value = it.data.error.message
             }
         }
 
+    val uiState: StateFlow<ShoppingUiState> = combine(
+        _shoppingItemListAsync, _totalPriceAsync, _errorMessage
+    ){ itemList, totalPrice, errorMessage ->
+        mergeState(itemList, totalPrice, errorMessage)
     }.stateIn(
         viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = ShoppingUiState(loading = true)
     )
+
+    private fun mergeState(
+        itemList: Async<DataResult<List<ShoppingItem>>>,
+        totalPrice: Async<DataResult<Int>>,
+        errorMessage: String?
+    ):ShoppingUiState {
+        val isLoading = (itemList == Async.Loading) || (totalPrice == Async.Loading)
+        val shoppingItemList = if(itemList is Async.Success && itemList.data is DataResult.Success) itemList.data.data else listOf()
+        val price = if(totalPrice is Async.Success && totalPrice.data is DataResult.Success) totalPrice.data.data else -1
+        return ShoppingUiState(shoppingItemList, price, isLoading, errorMessage)
+    }
+
 
     fun onEvent(event: ShoppingUiEvent){
         when(event){
@@ -73,6 +71,15 @@ class ShoppingViewModel @Inject constructor(
             is ShoppingUiEvent.InsertItem ->{
                 insertShoppingItem(event.item)
             }
+            is ShoppingUiEvent.ConsumeError ->{
+                consumeErrorMessage(event.error)
+            }
+        }
+    }
+
+    private fun consumeErrorMessage(error: String) {
+        viewModelScope.launch {
+            _errorMessage.value = null
         }
     }
 
