@@ -83,13 +83,13 @@ class ShoppingViewModel @Inject constructor(
         }
     }
 
-    private fun insertShoppingItem(item: ShoppingItem) {
+    fun insertShoppingItem(item: ShoppingItem) {
         viewModelScope.launch {
             shoppingRepository.insertShoppingItem(shoppingItem = item)
         }
     }
 
-    private fun deleteShoppingItem(item: ShoppingItem) {
+    fun deleteShoppingItem(item: ShoppingItem) {
         viewModelScope.launch {
             shoppingRepository.deleteShoppingItem(shoppingItem = item)
         }
