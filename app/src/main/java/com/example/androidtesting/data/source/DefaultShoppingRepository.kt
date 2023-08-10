@@ -26,6 +26,12 @@ class DefaultShoppingRepository(
         }
     }
 
+    override suspend fun updateAmountShoppingItem(shoppingItem: ShoppingItem, amount: Int) {
+        withContext(ioDispatcher){
+            localDataSource.updateAmountShoppingItem(shoppingItem, amount)
+        }
+    }
+
     override suspend fun searchImage(queryString: String): Flow<DataResult<List<ImageResult>>> {
         return remoteDataSource.searchImage(queryString).map {
             when(it){

@@ -12,6 +12,9 @@ interface ShoppingDao {
     @Insert(onConflict = REPLACE)
     suspend fun insertShoppingItem(shoppingItem: ShoppingItem)
 
+    @Query("UPDATE shopping_items SET amount = :amount WHERE id = :itemId")
+    suspend fun updateAmountShoppingItem(itemId: Int, amount: Int)
+
     @Delete
     suspend fun deleteShoppingItem(shoppingItem: ShoppingItem)
 
@@ -19,5 +22,5 @@ interface ShoppingDao {
     fun observeAllShoppingItem(): Flow<List<ShoppingItem>>
 
     @Query("SELECT SUM (amount * price) from shopping_items")
-    fun observeTotalPrice(): Flow<Int>
+    fun observeTotalPrice(): Flow<Int?>
 }

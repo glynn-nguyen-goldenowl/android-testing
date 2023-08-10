@@ -9,4 +9,18 @@
 
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <string name="message_empty">There is no shopping item\nclick on "+" to add</string>
+    <string name="total_price_formatted">Total price: %1$s</string>
+
+
+    <string name="shopping_item_list">ShoppingItemList</string>
+    <string name="add_shopping_item">AddShoppingItem</string>
+    <string name="add_cover_shopping_item">AddCover</string>
+    <string name="hint_item_name">item name</string>
+    <string name="hint_amount">amount</string>
+    <string name="hint_price">price per item</string>
+
+    <string name="action_add_item">Add item</string>
+
+
 </resources>

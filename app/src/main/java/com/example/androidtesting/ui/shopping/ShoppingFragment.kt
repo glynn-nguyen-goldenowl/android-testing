@@ -2,23 +2,26 @@ package com.example.androidtesting.ui.shopping
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.TextView
-import android.widget.Toast
 import androidx.annotation.VisibleForTesting
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.NavigationUI
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.androidtesting.R
+import com.example.androidtesting.util.CurrencyFormat
 import com.example.androidtesting.util.collectWhenOwnerStarted
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+
 
 @AndroidEntryPoint
 class ShoppingFragment : Fragment(R.layout.fragment_shopping) {
@@ -27,6 +30,7 @@ class ShoppingFragment : Fragment(R.layout.fragment_shopping) {
 
     @VisibleForTesting
     private var snackBar : Snackbar? = null
+
 
     @Inject
     lateinit var shoppingItemAdapter: ShoppingItemAdapter
@@ -61,22 +65,32 @@ class ShoppingFragment : Fragment(R.layout.fragment_shopping) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        requireActivity().title = getString(R.string.shopping_item_list)
+
         view.findViewById<View>(R.id.fabAddShoppingItem).setOnClickListener {
             addShoppingItem()
         }
-        view.findViewById<Button>(R.id.consumeError).setOnClickListener {
-            viewModel.onEvent(ShoppingUiEvent.ConsumeError("Error"))
-        }
+
         setupRecyclerView(view.findViewById(R.id.rvShoppingItems))
 
         viewModel.uiState.collectWhenOwnerStarted(
             viewLifecycleOwner
         ) {
-            view.findViewById<TextView>(R.id.tvShoppingTotalPrice).text = "Total Price: " +   it.totalPrice.toString()
+            val totalPriceView = view.findViewById<TextView>(R.id.tvShoppingTotalPrice)
+            totalPriceView.text = getString(R.string.total_price_formatted, CurrencyFormat.format(it.totalPrice))
             view.findViewById<ProgressBar>(R.id.progressBar).isVisible = it.loading
-            view.findViewById<TextView>(R.id.errorMessage).text = it.errorMessage ?: ""
-            view.findViewById<Button>(R.id.consumeError).isVisible = (it.errorMessage != null)
+            totalPriceView.isVisible = it.shoppingItemList.isNotEmpty()
+            view.findViewById<TextView>(R.id.lbEmptyItem).isVisible = it.shoppingItemList.isEmpty()
             shoppingItemAdapter.shoppingItems = it.shoppingItemList
+        }
+
+        shoppingItemAdapter.decrementAmountClicked = { item ->
+            viewModel.onEvent(ShoppingUiEvent.DecrementAmountItem(item))
+        }
+
+        shoppingItemAdapter.incrementAmountClicked = { item ->
+            viewModel.onEvent(ShoppingUiEvent.IncrementAmountItem(item))
         }
     }
     private fun addShoppingItem(){
@@ -89,6 +103,11 @@ class ShoppingFragment : Fragment(R.layout.fragment_shopping) {
         rvShoppingItems.apply {
             adapter = shoppingItemAdapter
             layoutManager = LinearLayoutManager(requireContext())
+            val dividerItemDecoration = DividerItemDecoration(
+                requireContext(),
+                DividerItemDecoration.VERTICAL
+            )
+            this.addItemDecoration(dividerItemDecoration)
             ItemTouchHelper(itemTouchCallback).attachToRecyclerView(this)
         }
     }

@@ -11,7 +11,6 @@ import kotlinx.coroutines.launch
 
 class FakeShoppingRepository : ShoppingRepository {
 
-
     var shouldImageSearchError: Boolean = false
 
     val totalPriceFlow : MutableStateFlow<Int> = MutableStateFlow(0)
@@ -47,9 +46,6 @@ class FakeShoppingRepository : ShoppingRepository {
     }
 
 
-
-
-
     override suspend fun insertShoppingItem(shoppingItem: ShoppingItem) {
         val items = shoppingItemFlow.value
         items.add(shoppingItem)
@@ -64,6 +60,10 @@ class FakeShoppingRepository : ShoppingRepository {
         shoppingItemFlow.value = items
         val totalPrice = items.sumOf { it.price * it.amount }
         totalPriceFlow.emit(totalPrice)
+
+    }
+
+    override suspend fun updateAmountShoppingItem(shoppingItem: ShoppingItem, amount: Int) {
 
     }
 

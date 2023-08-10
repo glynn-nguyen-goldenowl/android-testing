@@ -74,6 +74,13 @@ class ShoppingViewModel @Inject constructor(
             is ShoppingUiEvent.ConsumeError ->{
                 consumeErrorMessage(event.error)
             }
+
+            is ShoppingUiEvent.IncrementAmountItem ->{
+                incrementAmountShoppingItem(event.item)
+            }
+            is ShoppingUiEvent.DecrementAmountItem ->{
+                decrementAmountShoppingItem(event.item)
+            }
         }
     }
 
@@ -86,6 +93,23 @@ class ShoppingViewModel @Inject constructor(
     fun insertShoppingItem(item: ShoppingItem) {
         viewModelScope.launch {
             shoppingRepository.insertShoppingItem(shoppingItem = item)
+        }
+    }
+    fun incrementAmountShoppingItem(item: ShoppingItem) {
+        viewModelScope.launch {
+            val newAmount = item.amount + 1
+            shoppingRepository.updateAmountShoppingItem(shoppingItem = item, newAmount)
+        }
+    }
+
+    fun decrementAmountShoppingItem(item: ShoppingItem) {
+        viewModelScope.launch {
+            val newAmount = item.amount - 1
+            if(newAmount >= 0){
+                shoppingRepository.updateAmountShoppingItem(shoppingItem = item, newAmount)
+            }else{
+                // error
+            }
         }
     }
 

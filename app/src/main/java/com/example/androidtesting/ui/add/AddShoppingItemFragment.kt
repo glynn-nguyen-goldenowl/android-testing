@@ -40,6 +40,8 @@ class AddShoppingItemFragment : Fragment(R.layout.fragment_add_shopping_item) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        requireActivity().title = getString(R.string.add_shopping_item)
+
         view.findViewById<View>(R.id.btnAddShoppingItem).setOnClickListener {
             val name = view.findViewById<EditText>(R.id.etShoppingItemName).text.toString()
             val amount = view.findViewById<EditText>(R.id.etShoppingItemAmount).text.toString()
@@ -52,19 +54,23 @@ class AddShoppingItemFragment : Fragment(R.layout.fragment_add_shopping_item) {
             openImagePicker()
         }
 
-        view.findViewById<View>(R.id.btnExit).setOnClickListener {
-            findNavController().popBackStack()
-        }
-
         viewModel.uiState.collectWhenOwnerStarted(
             viewLifecycleOwner
         ) {
-            clearAllError()
             it.errorMessage?.let { errorMessage ->
+                clearAllError()
                 showError(errorMessage)
             }
             it.shoppingItem?.let {
-                view.findViewById<View>(R.id.btnExit).isEnabled = true
+                clearAllError()
+                Snackbar.make(
+                    requireView(),
+                    "add item successful",
+                    Snackbar.LENGTH_SHORT
+                ).apply {
+                    show()
+                }
+                findNavController().popBackStack()
             }
         }
 
@@ -95,9 +101,9 @@ class AddShoppingItemFragment : Fragment(R.layout.fragment_add_shopping_item) {
     }
 
     fun clearAllError() {
-        requireView().rootView.findViewById<TextInputLayout>(R.id.textInputLayout).error = null
-        requireView().rootView.findViewById<TextInputLayout>(R.id.textInputLayout2).error = null
-        requireView().rootView.findViewById<TextInputLayout>(R.id.textInputLayout3).error = null
+        requireView().rootView.findViewById<TextInputLayout>(R.id.itemNameInputLayout).error = null
+        requireView().rootView.findViewById<TextInputLayout>(R.id.priceInputLayout).error = null
+        requireView().rootView.findViewById<TextInputLayout>(R.id.amountInputLayout).error = null
     }
 
     private fun showError(error: String) {
@@ -117,20 +123,20 @@ class AddShoppingItemFragment : Fragment(R.layout.fragment_add_shopping_item) {
 
             AddShoppingItemViewModel.INVALID_NAME -> {
                 val inputLayout =
-                    requireView().rootView.findViewById<TextInputLayout>(R.id.textInputLayout)
+                    requireView().rootView.findViewById<TextInputLayout>(R.id.itemNameInputLayout)
                 inputLayout.error = "Invalid name"
 
             }
 
             AddShoppingItemViewModel.INVALID_PRICE -> {
                 val inputLayout =
-                    requireView().rootView.findViewById<TextInputLayout>(R.id.textInputLayout2)
+                    requireView().rootView.findViewById<TextInputLayout>(R.id.priceInputLayout)
                 inputLayout.error = "Invalid price"
             }
 
             AddShoppingItemViewModel.INVALID_AMOUNT -> {
                 val inputLayout =
-                    requireView().rootView.findViewById<TextInputLayout>(R.id.textInputLayout3)
+                    requireView().rootView.findViewById<TextInputLayout>(R.id.amountInputLayout)
                 inputLayout.error = "Invalid amount"
             }
         }
